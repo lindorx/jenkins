@@ -35,7 +35,7 @@ pipeline {
             agent{
                 node{
                     label "Beijing-x86_64-node1"
-                    customWorkspace root_path + "UOS-kernel-D-4.19-arm"
+                    customWorkspace root_path + "$GERRIT_PROJECT"
                 }
             }
             steps {
@@ -50,6 +50,8 @@ pipeline {
                 sh "make prepare -j && make scripts -j && make init -j"
                 sh "make drivers/scsi/scsi_sysfs.o"
                 //sh kabi_check_path+"/check_kabi.sh "+kabi_check_path+"/Kabi.path_x86_64 "+kernel_rpmbuild_path+"/"+defkabifile_x86_64
+                sh "make distclean -j"
+                sh "git checkout $GERRIT_BRANCH && git branch -D temp"
             }
         }
         stage("arm64-check") {
